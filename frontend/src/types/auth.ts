@@ -1,5 +1,5 @@
 export interface User {
-    id?: string;
+    id?: string;        // Optional for new User (MongoDB generates)
     username: string;
     email: string;
 }
