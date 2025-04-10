@@ -12,5 +12,17 @@ export const authService = {
     register: async (data: RegisterRequest): Promise<User> => {
         const response = await axios.post(`${API_URL}/auth/register`, data);
         return response.data;
+    },
+
+    logout: async (): Promise<void> => {
+        // Here we would get rid of stored tokens. I don't think this is applicable to this setup right now.
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+
+        // Here we would call the logout endpoint if the backend tracked the session
+        // await axios.post(`${API_URL}/auth/logout`);
+
+        // Return a resolved promise
+        return Promise.resolve();
     }
 };

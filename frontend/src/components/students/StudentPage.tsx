@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Student, CreateStudentRequest, UpdateStudentRequest } from '../../types/student';
 import { studentService } from '../../services/studentApi';
+import { authService } from '../../services/api';
 import StudentTable from './StudentTable';
 import AddStudentModal from './AddStudentModal';
 import EditStudentModal from './EditStudentModal';
+import { useNavigate } from 'react-router-dom';
 
 function StudentPage() {
+    // For logout
+    const navigate = useNavigate();
+
     const [students, setStudents] = useState<Student[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null> (null);
@@ -76,9 +81,28 @@ function StudentPage() {
         }
     };
 
+    // Log out handler
+    const handleLogout = async () => {
+        try {
+            await authService.logout();
+            navigate("/login"); // Redirect to login page
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
+
     return (
         <div className="student-page">
-            <h1>Student Management</h1>
+            <div className="header">
+                <h1>Student Management</h1>
+                <button
+                    onClick={handleLogout}
+                    className="logout-button"
+                >
+                    Logout
+                </button>
+            </div>
+            
 
             {error && <div className="error-message">{error}</div>}
 
