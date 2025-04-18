@@ -32,13 +32,9 @@ public class UserService {
         return userRepository.findByUsername(username).orElse(null);
     }
 
-    public boolean authenticate(String username, String password) {
-        User user = userRepository.findByUsername(username).orElse(null);
-        if (user == null) {
-            return false;
-        }
 
-        // Spring Security PasswordEncoder to verify password
-        return passwordEncoder.matches(password, user.getPassword());
+    public User findById(String id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

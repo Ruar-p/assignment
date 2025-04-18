@@ -1,12 +1,5 @@
 package com.example.backend.config;
 
-/*
-Filter that intercepts each request, extracts JWT from the header,
-validates it, and if valid, sets up the authenticated user in Spring
-Security's context.
-
-This enables access to protected resources
-*/
 
 import com.example.backend.security.JwtAuthFilter;
 import com.example.backend.service.UserDetailsServiceImpl;
@@ -26,13 +19,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
+// TODO: Look into this more
+/*
+Filter that intercepts each request, extracts JWT from the header,
+validates it, and if valid, sets up the authenticated user in Spring
+Security's context.
+
+This enables access to protected resources
+*/
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final UserDetailsServiceImpl userDetailsService;    // TODO: Might need to change this to UserDetailsService
+    private final UserDetailsServiceImpl userDetailsService;    // TODO: Might need to change this to UserDetailsService, instead of Impl
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserDetailsServiceImpl userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
