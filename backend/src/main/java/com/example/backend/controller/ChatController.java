@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -133,6 +134,29 @@ public class ChatController {
         return ResponseEntity.ok(users);
     }
 
+    // Poll for new sent or received messages
+    @GetMapping("/poll")
+    public ResponseEntity<List<MessageResponse>> pollNewMessages(
+            Authentication authentication,
+            @RequestParam String timestamp) {
+
+        // Get current user ID from JWT authentication
+        String currentUsername = authentication.getName();
+        User currentUser = userService.findByUsername(currentUsername);
+
+        // Parse timestamp
+        LocalDateTime since = LocalDateTime.parse(timestamp);
+
+        // Get new messages
+        List<Message> newMessages = chatService.getNewMessages(currentUser.getId(), since);
+
+        // Convert response into DTOs
+        List<MessageResponse> response = newMessages.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
 
 
 

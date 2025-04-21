@@ -54,7 +54,6 @@ public class ChatService {
         return Stream.concat(sentMessages.stream(), receivedMessages.stream())
                 .sorted(Comparator.comparing(Message::getTimestamp))
                 .collect(Collectors.toList());
-
     }
 
     // Mark a message as read
@@ -98,5 +97,20 @@ public class ChatService {
         }
 
         return new ArrayList<>(chatUsers);
+    }
+
+    // Get messages newer than specific timestamp (for polling)
+    public List<Message> getNewMessages(String userId, LocalDateTime since) {
+        // Find messages where
+        // - User is the receiver and timestamp > since
+        // OR
+        // - User is the sender and timestamp > since
+        List<Message> receivedMessages = messageRepository.findByReceiverIdAndTimestampAfterOrderByTimestampAsc(userId, since);
+        List<Message> sentMessages = messageRepository.findBySenderIdAndTimestampAfterOrderByTimestampAsc(userId, since);
+
+        // Combine and sort by timestamp
+        return Stream.concat(sentMessages.stream(), receivedMessages.stream())
+                .sorted(Comparator.comparing(Message::getTimestamp))
+                .collect(Collectors.toList());
     }
 }
