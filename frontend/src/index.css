@@ -61,6 +61,8 @@ button {
   font-weight: 500;
   transition: background-color 0.3s;
   width: 100%;
+  margin-bottom: 5px;
+  margin-top: 5px;
 }
 
 button:hover {
@@ -194,6 +196,7 @@ a {
 }
 
 .logout-button {
+  width: 25%;
   background-color: #f44336;
   color: white;
   border: none;
