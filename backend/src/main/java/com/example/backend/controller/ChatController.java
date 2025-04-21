@@ -17,6 +17,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+/*
+    Chat endpoints.
+
+    Authentication is added to identify the specific
+    user that is making the request, which is not the same situation
+    as the StudentController at the moment. If access to students will
+    be restricted depending on user authentication, those endpoints will
+    need to change.
+ */
 
 @RestController
 @RequestMapping("/api/chat")
