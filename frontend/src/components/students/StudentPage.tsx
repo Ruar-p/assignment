@@ -6,10 +6,13 @@ import StudentTable from './StudentTable';
 import AddStudentModal from './AddStudentModal';
 import EditStudentModal from './EditStudentModal';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 function StudentPage() {
     // For logout
+    const { logout } = useAuth();
     const navigate = useNavigate();
+    
 
     const [students, setStudents] = useState<Student[]>([]);
     const [loading, setLoading] = useState(true);
@@ -83,12 +86,8 @@ function StudentPage() {
 
     // Log out handler
     const handleLogout = async () => {
-        try {
-            await authService.logout();
-            navigate("/login"); // Redirect to login page
-        } catch (error) {
-            console.error("Logout failed", error);
-        }
+        logout();
+        navigate('/login');
     };
 
     return (

@@ -12,6 +12,7 @@ const Register = () => {
     
     const [error, setError] = useState<string>('');
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -22,11 +23,20 @@ const Register = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError('');
+
         try {
+            // Register user, but DON'T change auth state
+            // No automatic login on registration
             await authService.register(formData);
+
+            // Redirect to login page after successful registration
             navigate('/login');
         } catch (err) {
             setError('Registration failed');
+        } finally {
+            setIsLoading(false);
         }
     };
 

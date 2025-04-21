@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/api';
 import { LoginRequest } from '../types/auth';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
     const [formData, setFormData] = useState<LoginRequest>({
@@ -9,9 +10,13 @@ const Login = () => {
         password: ''
     });
 
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { login } = useAuth();
     const [error, setError] = useState<string>('');
     const navigate = useNavigate();
 
+
+    // Update form field state
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
             ...formData,
@@ -19,13 +24,27 @@ const Login = () => {
         });
     };
 
+    // Submit form data
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError('');
+
         try {
-            await authService.login(formData);
-            navigate('/home');
+            const response = await authService.login(formData);
+
+            // Use login function from AuthContext to update global state
+            login(response.token, {
+                id: response.userId,
+                username: response.username,
+                email: '' // Backend doesn't return email in the login response
+            });
+
+            navigate('/students');
         } catch (err) {
             setError('Invalid credentials');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -54,7 +73,9 @@ const Login = () => {
                         required
                     />
                 </div>
-                <button type="submit">Login</button>
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Logging in...' : 'Login'}
+                </button>
             </form>
             <p>
                 Don't have an account? <Link to="/register">Register</Link>
