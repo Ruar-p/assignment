@@ -9,15 +9,16 @@ import api from './axiosConfig';
     baseUrl = /api/
 */
 
+const API_URL = '/auth';
 
 export const authService = {
     login: async (data: LoginRequest): Promise<AuthResponse> => {
-        const response = await api.post(`auth/login`, data);
+        const response = await api.post(`${API_URL}/login`, data);
         return response.data;
     },
 
     register: async (data: RegisterRequest): Promise<AuthResponse> => {
-        const response = await api.post(`auth/register`, data);
+        const response = await api.post(`${API_URL}/register`, data);
         return response.data;
     },
 

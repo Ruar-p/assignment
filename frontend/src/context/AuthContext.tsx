@@ -6,6 +6,8 @@ import { User } from '../types/auth';
     instead of passing down props through component tree.
 */
 
+
+// Define format
 interface AuthContextType {
     isAuthenticated: boolean;
     user: User | null;
