@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Student, CreateStudentRequest, UpdateStudentRequest } from '../../types/student';
 import { studentService } from '../../services/studentApi';
-import { authService } from '../../services/api';
 import StudentTable from './StudentTable';
 import AddStudentModal from './AddStudentModal';
 import EditStudentModal from './EditStudentModal';
