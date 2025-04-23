@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.MessageRequest;
 import com.example.backend.dto.MessageResponse;
+import com.example.backend.dto.UserResponse;
 import com.example.backend.model.Message;
 import com.example.backend.model.User;
 import com.example.backend.service.ChatService;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 
 
 /*
-    Chat endpoints.
+    Chat Endpoints
 
     Authentication is added to identify the specific
     user that is making the request, which is not the same situation
@@ -119,9 +120,10 @@ public class ChatController {
         return ResponseEntity.ok(response);
     }
 
-    // Get list of user that current user has chatted with
+    // Get list of users that current user has chatted with
+    // TODO: Maybe move this to UserController instead?
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getChatUser(
+    public ResponseEntity<List<UserResponse>> getChatUser(
             Authentication authentication) {
         // Get current user ID from JWT authentication
         String currentUsername = authentication.getName();
@@ -140,7 +142,12 @@ public class ChatController {
             }
         }
 
-        return ResponseEntity.ok(users);
+        // Then to dto list
+        List<UserResponse> response = users.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
 
     // Poll for new sent or received messages
@@ -169,7 +176,6 @@ public class ChatController {
 
 
 
-
     // Helper method to convert Message entity to MessageResponse DTO
     private MessageResponse convertToDto(Message message) {
         MessageResponse dto = new MessageResponse();
@@ -189,6 +195,19 @@ public class ChatController {
         } catch (Exception e) {
             // TODO: Handle case where a user might be deleted
         }
+
+        return dto;
+    }
+
+    // Helper method to convert User entity to UserResponse DTO
+    private UserResponse convertToDto(User user) {
+        UserResponse dto = new UserResponse();
+
+        // Might want to change which properties are shared depending on
+        // security needs of the chat.
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
 
         return dto;
     }

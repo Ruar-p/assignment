@@ -1,9 +1,12 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.CreateStudentRequest;
+import com.example.backend.dto.MessageResponse;
 import com.example.backend.dto.StudentResponse;
 import com.example.backend.dto.UpdateStudentRequest;
+import com.example.backend.model.Message;
 import com.example.backend.model.Student;
+import com.example.backend.model.User;
 import com.example.backend.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/students")
@@ -36,12 +40,7 @@ public class StudentController {
         Student savedStudent = studentService.addStudent(student);
 
         // Convert entity to response DTO
-        StudentResponse response = new StudentResponse();
-        response.setId(savedStudent.getId());
-        response.setName(savedStudent.getName());
-        response.setCourses(savedStudent.getCourses());
-        response.setPhoneNumber(savedStudent.getPhoneNumber());
-        response.setDateOfBirth(savedStudent.getDateOfBirth());
+        StudentResponse response = convertToDto(savedStudent);
 
         return ResponseEntity.created(URI.create("/api/students/" + savedStudent.getId()))
                                         .body(response);
@@ -49,73 +48,47 @@ public class StudentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<StudentResponse> getStudentById(@PathVariable String id) {
-        try {
-            Student student = studentService.findById(id);
+        Student student = studentService.findById(id);
 
-            // Convert to DTO
-            StudentResponse response = new StudentResponse();
-            response.setId(student.getId());
-            response.setName(student.getName());
-            response.setCourses(student.getCourses());
-            response.setPhoneNumber(student.getPhoneNumber());
-            response.setDateOfBirth(student.getDateOfBirth());
+        // Convert to DTO
+        StudentResponse response = convertToDto(student);
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
     public ResponseEntity<List<StudentResponse>> getAllStudents() {
         List<Student> students = studentService.getAllStudents();
 
-        // Convert to DTO list
-        List<StudentResponse> responseList = new ArrayList<>();
-        for (Student student : students) {
-            StudentResponse response = new StudentResponse();
-            response.setId(student.getId());
-            response.setName(student.getName());
-            response.setCourses(student.getCourses());
-            response.setPhoneNumber(student.getPhoneNumber());
-            response.setDateOfBirth(student.getDateOfBirth());
-            responseList.add(response);
-        }
+        // Convert to list of DTO
+        List<StudentResponse> response = students.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(responseList);
+        return ResponseEntity.ok(response);
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<StudentResponse> updateStudent(@PathVariable String id,
                                                          @RequestBody UpdateStudentRequest updateRequest) {
-        try {
-            // Verify existence of student with provided id
-            Student existingStudent = studentService.findById(id);
+        // Verify existence of student with provided id
+        Student existingStudent = studentService.findById(id);
 
-            // Update fields
-            existingStudent.setName(updateRequest.getName());
-            existingStudent.setCourses(updateRequest.getCourses());
-            existingStudent.setPhoneNumber(updateRequest.getPhoneNumber());
-            existingStudent.setDateOfBirth(updateRequest.getDateOfBirth());
+        // Update fields
+        existingStudent.setName(updateRequest.getName());
+        existingStudent.setCourses(updateRequest.getCourses());
+        existingStudent.setPhoneNumber(updateRequest.getPhoneNumber());
+        existingStudent.setDateOfBirth(updateRequest.getDateOfBirth());
 
-            // Save updated student
-            Student updatedStudent = studentService.editStudent(existingStudent);
+        // Save updated student
+        Student updatedStudent = studentService.editStudent(existingStudent);
 
-            // Convert to DTO
-            StudentResponse response = new StudentResponse();
-            response.setId(updatedStudent.getId());
-            response.setName(updatedStudent.getName());
-            response.setCourses(updatedStudent.getCourses());
-            response.setPhoneNumber(updatedStudent.getPhoneNumber());
-            response.setDateOfBirth(updatedStudent.getDateOfBirth());
+        // Convert to DTO
+        StudentResponse response = convertToDto(updatedStudent);
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(response);
+
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable String id) {
         try {
@@ -129,5 +102,18 @@ public class StudentController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+
+    // Helper method for consistency with other controllers
+    private StudentResponse convertToDto(Student student) {
+        StudentResponse dto = new StudentResponse();
+        dto.setId(student.getId());
+        dto.setName(student.getName());
+        dto.setCourses(student.getCourses());
+        dto.setPhoneNumber(student.getPhoneNumber());
+        dto.setDateOfBirth(student.getDateOfBirth());
+
+        return dto;
     }
 }
