@@ -4,6 +4,7 @@ import Register from './components/Register';
 import StudentPage from './components/students/StudentPage';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ChatPage from './components/chat/ChatPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/students" element={<StudentPage />} />
+            <Route path="/chat" element={<ChatPage />} />
             {/* Future protected routes go here */}
           </Route>
           
@@ -25,6 +27,6 @@ function App() {
       </BrowserRouter>
     </AuthProvider>
   );
-}
+};
 
 export default App;

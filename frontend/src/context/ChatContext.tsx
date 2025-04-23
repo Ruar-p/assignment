@@ -1,11 +1,13 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { Message, ChatUser } from '../types/chat';
 import { chatService } from '../services/chatApi';
+import { userService } from '../services/userApi';
 import { useAuth } from './AuthContext';
 
 // Define format
 interface ChatContextType {
     users: ChatUser[];
+    allUsers: ChatUser[];
     selectedUser: ChatUser | null;
     messages: Message[];
     unreadCounts: Map<string, number>;
@@ -17,6 +19,7 @@ interface ChatContextType {
 // Create the context with a default value
 const ChatContext = createContext<ChatContextType>({
     users: [],
+    allUsers: [],
     selectedUser: null,
     messages: [],
     unreadCounts: new Map(),
@@ -29,32 +32,50 @@ const ChatContext = createContext<ChatContextType>({
 
 export const ChatProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
     const { user: currentUser } = useAuth();                                            
-    const [users, setUsers] = useState<ChatUser[]>([]);                                 // List of users
+    const [users, setUsers] = useState<ChatUser[]>([]);                                 // List of users that have chatted with current user
+    const [allUsers, setAllUsers] = useState<ChatUser[]>([]);                           // List of ALL users that are in the system
     const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);            // Selected user
     const [messages, setMessages] = useState<Message[]>([]);                            // List of messages
     const [unreadCounts, setUnreadCounts] = useState<Map<string, number>>(new Map());   // Read message count
-    const [lastPoll, setLastPoll] = useState<string>(new Date().toISOString());         // Most recent poll time
+
+    // The toISOString method adds a letter to the end denoting timezone
+    // In this case it is Z
+    // I am just stripping it everywhere for now
+    const [lastPoll, setLastPoll] = useState<string>(new Date().toISOString().replace('Z', ''));         // Most recent poll time
 
     // Load chat users on mount
     useEffect(() => {
         if (currentUser) {
+            // TODO: Probably just change it to load all users and select from all users
+            // However, there might be a problem if userbase becomes massive and there is 3 second polling....
             loadChatUsers();
+            loadAllChatUsers();
             loadUnreadMessages();
 
             // Set up polling for new messages
-            const interval = setInterval(pollMessages, 3000); // 3 seconds between poll
+            const interval = setInterval(pollMessages, 3000); // 3 seconds between poll?
             return () => clearInterval(interval);
         }
-    }, [currentUser]); // Update every time current user changes
+    }, [currentUser]); // Run every time current user changes
 
 
-    // Load users that have chatted with current user
+    // Load ONLY users that have chatted with current user
     const loadChatUsers = async () => {
         try {
             const chatUsers = await chatService.getChatUsers();
             setUsers(chatUsers);
         } catch (error) {
             console.error('Failed to load chat users', error);
+        }
+    };
+
+    // Load ALL users (for initial chat dropdown)
+    const loadAllChatUsers = async () => {
+        try {
+            const allChatUsers = await userService.getAllChatUsers();
+            setAllUsers(allChatUsers);
+        } catch (error) {
+            console.error('Failed to load all users', error);
         }
     };
 
@@ -79,8 +100,9 @@ export const ChatProvider: React.FC<{children: React.ReactNode}> = ({ children }
     // Poll for new messages
     const pollMessages = async () => {
         try {
-            const newMessages = await chatService.pollNewMessages(lastPoll);    // Use API to get messages newer than last polling time stored on front end
-            setLastPoll(new Date().toISOString());                              // Update last polling time
+
+            const newMessages = await chatService.pollNewMessages(lastPoll.replace('Z', ''));    // Use API to get messages newer than last polling time stored on front end
+            setLastPoll(new Date().toISOString().replace('Z', ''));                              // Update last polling time
 
             // Go through new message list if it is not empty
             if (newMessages.length > 0) {
@@ -155,6 +177,7 @@ export const ChatProvider: React.FC<{children: React.ReactNode}> = ({ children }
         <ChatContext.Provider
             value={{
                 users,
+                allUsers,
                 selectedUser,
                 messages,
                 unreadCounts,

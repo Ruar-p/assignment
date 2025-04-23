@@ -84,7 +84,7 @@ function StudentPage() {
         }
     };
 
-    // Log out handler
+    // Update auth context and navigate to login screen on logout
     const handleLogout = async () => {
         logout();
         navigate('/login');
@@ -94,12 +94,11 @@ function StudentPage() {
         <div className="student-page">
             <div className="header">
                 <h1>Student Management</h1>
-                <button
-                    onClick={handleLogout}
-                    className="logout-button"
-                >
-                    Logout
-                </button>
+                <div className="actions">
+                <button onClick={() => navigate('/chat')}>Chat</button>
+                    <button onClick={handleLogout} className="logout-button">Logout</button>
+                </div>
+                
             </div>
             
 
