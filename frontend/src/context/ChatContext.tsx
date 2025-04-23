@@ -133,6 +133,9 @@ export const ChatProvider: React.FC<{children: React.ReactNode}> = ({ children }
                 
                 // Update unread counts
                 loadUnreadMessages();
+
+                // Also refresh chat users list to include this user if they're not already there
+                loadChatUsers();
             } catch (error) {
                 console.error('Failed to load conversation', error);
             }
@@ -153,6 +156,9 @@ export const ChatProvider: React.FC<{children: React.ReactNode}> = ({ children }
 
             // Refresh messages to show the new message
             refreshMessages();
+
+            // After sending first message, refresh the chat users list
+            await loadChatUsers();
         } catch (error) {
             console.error('Failed to send message', error);
         }

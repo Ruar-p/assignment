@@ -158,7 +158,8 @@
 
 .message-input button {
     width: fit-content;
-    padding: 0 10px;
+    margin: 0px;
+    padding: 0px 10px;
     background-color: #4285f4;
     color: white;
     border: none;

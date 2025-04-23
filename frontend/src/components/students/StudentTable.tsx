@@ -9,15 +9,27 @@ interface StudentTableProps {
 }
 
 const StudentTable = ({ students, onEdit, onDelete }: StudentTableProps) => {
-    // Format date for display
+
+    // Update date formatting to not include timezone
     const formatDate = (dateString: string) => {
         try {
-          const date = new Date(dateString);
-          return date.toLocaleDateString();
+            // Create a date object directly from the full ISO string
+            const date = new Date(dateString);
+            
+            // Format using year, month, day directly from the date
+            // Use UTC methods to get the date components
+            // 
+            const year = date.getUTCFullYear();
+            const month = date.getUTCMonth() + 1; // Month is 0-indexed
+            const day = date.getUTCDate();
+            
+            // Return formatted date (e.g., "4/23/2025")
+            return `${month}/${day}/${year}`;
+            
         } catch (e) {
-          return dateString;
+            return dateString;
         }
-    };
+    }
 
     return (
         <table className="student-table">
