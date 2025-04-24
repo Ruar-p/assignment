@@ -19,8 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-// TODO: Look into this more
 /*
 Filter that intercepts each request, extracts JWT from the header,
 validates it, and if valid, sets up the authenticated user in Spring

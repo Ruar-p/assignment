@@ -21,6 +21,8 @@ Utility class that handles all JWT operations:
 - Extracting information from tokens
 - Validating tokens when users access protected resources
  */
+
+// TODO: In the future, a token refresh and revocation system could be added
 @Component
 public class JwtUtil {
 
