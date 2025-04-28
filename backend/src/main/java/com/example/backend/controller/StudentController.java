@@ -1,19 +1,15 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.CreateStudentRequest;
-import com.example.backend.dto.MessageResponse;
 import com.example.backend.dto.StudentResponse;
 import com.example.backend.dto.UpdateStudentRequest;
-import com.example.backend.model.Message;
 import com.example.backend.model.Student;
-import com.example.backend.model.User;
 import com.example.backend.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,12 +44,17 @@ public class StudentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<StudentResponse> getStudentById(@PathVariable String id) {
-        Student student = studentService.findById(id);
+        try {
+            Student student = studentService.findById(id);
 
-        // Convert to DTO
-        StudentResponse response = convertToDto(student);
+            // Convert to DTO
+            StudentResponse response = convertToDto(student);
 
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @GetMapping
@@ -71,22 +72,27 @@ public class StudentController {
     @PutMapping("/{id}")
     public ResponseEntity<StudentResponse> updateStudent(@PathVariable String id,
                                                          @RequestBody UpdateStudentRequest updateRequest) {
-        // Verify existence of student with provided id
-        Student existingStudent = studentService.findById(id);
+        try {
+            // Verify existence of student with provided id
+            Student existingStudent = studentService.findById(id);
 
-        // Update fields
-        existingStudent.setName(updateRequest.getName());
-        existingStudent.setCourses(updateRequest.getCourses());
-        existingStudent.setPhoneNumber(updateRequest.getPhoneNumber());
-        existingStudent.setDateOfBirth(updateRequest.getDateOfBirth());
+            // Update fields
+            existingStudent.setName(updateRequest.getName());
+            existingStudent.setCourses(updateRequest.getCourses());
+            existingStudent.setPhoneNumber(updateRequest.getPhoneNumber());
+            existingStudent.setDateOfBirth(updateRequest.getDateOfBirth());
 
-        // Save updated student
-        Student updatedStudent = studentService.editStudent(existingStudent);
+            // Save updated student
+            Student updatedStudent = studentService.editStudent(existingStudent);
 
-        // Convert to DTO
-        StudentResponse response = convertToDto(updatedStudent);
+            // Convert to DTO
+            StudentResponse response = convertToDto(updatedStudent);
 
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+
 
     }
     @DeleteMapping("/{id}")
